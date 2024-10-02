@@ -172,6 +172,19 @@ fn push(tag string) {
     if response.status_code == 200 {
         println('Request successful. Response body:')
         println(response.body)
+
+        // Get the hub username to construct the flist URL
+        hub_user := get_hub_username(tfhub_token) or {
+            error_message('Failed to get hub username')
+            exit(1)
+        }
+
+        // Construct the flist URL
+        flist_name := tag.replace(':', '-') + '.flist'
+        flist_url := 'https://hub.grid.tf/$hub_user/$flist_name'
+        
+        println('\nFlist URL:')
+        println(flist_url)
     } else {
         eprintln('Request failed with status code: ${response.status_code}')
         eprintln('Response body:')
