@@ -1,5 +1,4 @@
 import os
-import json
 import net.http
 import term
 
@@ -133,41 +132,41 @@ fn push(tag string) {
 	}
 
 	println('Converting Docker image to flist now...')
-	mut headers := http.new_header()
-	headers.add_custom('Authorization', 'bearer ${tfhub_token}') or {
-		error_message('Failed to add authorization header')
-		exit(1)
-	}
-	
-	form_data := {
-		'image': full_tag
-	}
-	http.post_form('https://hub.grid.tf/api/flist/me/docker', form_data) or {
-		error_message('Failed to convert Docker image to flist: ${err}')
-		exit(1)
-	}
 
-	println('Conversion attempt completed, check above for success')
-	println('Here are paths matching the tag name:')
+    url := 'https://hub.grid.tf/api/flist/me/docker'
+    data := 'image=$full_tag'
+    
+    mut config := http.FetchConfig{
+        url: url
+        method: .post
+        data: data
+        header: http.new_header(
+            key: .authorization
+            value: 'bearer $tfhub_token'
+        )
+    }
 
-	url := 'https://hub.grid.tf/api/flist/${docker_user}'
-	flist_resp := http.get(url) or {
-		error_message('Failed to fetch flists: ${err}')
-		exit(1)
-	}
+    // Add Content-Type header
+    config.header.add_custom('Content-Type', 'application/x-www-form-urlencoded') or {
+        eprintln('Add custom failed: $err')
+        exit(1)
+    }
 
-	flist_json := json.decode([]map[string]string, flist_resp.body) or {
-		error_message('Failed to parse flists response: ${err}')
-		exit(1)
-	}
+    response := http.fetch(config) or {
+        eprintln('HTTP POST request failed: $err')
+        exit(1)
+    }
 
-	tag_name := tag.all_before(':')
-	for flist in flist_json {
-		flist_name := flist['name'] or { continue }
-		if flist_name.contains(tag_name) {
-			println('https://hub.grid.tf/${docker_user}/${flist_name}')
-		}
-	}
+    if response.status_code == 200 {
+        println('Request successful. Response body:')
+        println(response.body)
+    } else {
+        eprintln('Request failed with status code: ${response.status_code}')
+        eprintln('Response body:')
+        eprintln(response.body)
+        exit(1)
+    }
+
 }
 
 fn delete(flist_name string) {
