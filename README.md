@@ -6,6 +6,7 @@
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
   - [Building and Installing](#building-and-installing)
+  - [Rebuild Locally](#rebuild-locally)
 - [Usage](#usage)
 - [OS-Specific Instructions](#os-specific-instructions)
   - [Windows](#windows)
@@ -41,6 +42,14 @@ Flist CLI is a tool that turns Dockerfiles and Docker images directly into Flist
    ```
 
    This will copy the `flist` executable to the appropriate system location.
+
+### Rebuild Locally
+
+You can use the Makefile command to deploy on Linux:
+
+```
+make build
+```
 
 ## Usage
 
