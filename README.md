@@ -45,7 +45,7 @@ Flist CLI is a tool that turns Dockerfiles and Docker images directly into Flist
 
 ### Rebuild Locally
 
-You can use the Makefile command to deploy on Linux:
+You can use the Makefile command to uninstall and reinstall the binary:
 
 ```
 make build
