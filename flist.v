@@ -267,7 +267,7 @@ fn get_hub_username(tfhub_token string) ?string {
     return none
 }
 
-fn ls() {
+fn ls(show_url bool) {
     tfhub_token := os.read_file(token_file) or {
         error_message('No token found. Please run \'flist login\' first.')
         exit(1)
@@ -306,7 +306,11 @@ fn ls() {
 
     println('Flists for user $hub_user:')
     for item in data {
-        println(item.name)
+        if show_url {
+            println('https://hub.grid.tf/$hub_user/${item.name}')
+        } else {
+            println(item.name)
+        }
     }
 }
 
@@ -322,6 +326,7 @@ fn help() {
     println(term.blue('  delete    ') + '- Delete an flist from Flist Hub')
     println(term.blue('  rename    ') + '- Rename an flist in Flist Hub')
     println(term.blue('  ls        ') + '- List all flists of the current user')
+    println(term.blue('  ls url    ') + '- List all flists of the current user with full URLs')
     println(term.blue('  help      ') + '- Display this help message\n')
     println(term.bold('Usage:'))
     println('  flist install')
@@ -332,6 +337,7 @@ fn help() {
     println('  flist delete <flist_name>')
     println('  flist rename <flist_name> <new_flist_name>')
     println('  flist ls')
+    println('  flist ls url')
     println('  flist help')
 }
 
@@ -370,7 +376,16 @@ fn main() {
                 exit(1)
             }
         }
-        'ls' { ls() }
+        'ls' {
+            if os.args.len == 2 {
+                ls(false)
+            } else if os.args.len == 3 && os.args[2] == 'url' {
+                ls(true)
+            } else {
+                error_message('Incorrect usage of \'ls\'. Use \'ls\' or \'ls url\'.')
+                exit(1)
+            }
+        }
         'help' { help() }
         else {
             error_message('Unknown command: ' + os.args[1])
